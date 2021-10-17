@@ -97,23 +97,48 @@ impl Data {
 
         let mut count = 0;
         for chunk in chunks.iter_mut() {
-            let offset = (self.offset % DATA_MOD as u64) as usize;
-            let to_send = ((self.len - self.offset) as usize)
-                .min(amount)
-                .min(DATA.len() - offset);
+            if let Some(data) = self.send_one(amount) {
+                if data.is_empty() {
+                    break;
+                }
 
-            if to_send == 0 {
-                break;
+                amount -= data.len();
+                count += 1;
+                *chunk = data;
             }
-
-            *chunk = DATA.slice(offset..offset + to_send);
-
-            self.offset += to_send as u64;
-            amount -= to_send;
-            count += 1;
         }
 
         Some(count)
+    }
+
+    /// Sends a single chunk of data
+    pub fn send_one(&mut self, amount: usize) -> Option<Bytes> {
+        if self.is_finished() {
+            return None;
+        }
+
+        let offset = (self.offset % DATA_MOD as u64) as usize;
+        let to_send = ((self.len - self.offset) as usize)
+            .min(amount)
+            .min(DATA.len() - offset);
+
+        if to_send == 0 {
+            return Some(Bytes::new());
+        }
+
+        let chunk = DATA.slice(offset..offset + to_send);
+
+        self.offset += to_send as u64;
+
+        Some(chunk)
+    }
+
+    pub fn offset(&self) -> u64 {
+        self.offset
+    }
+
+    pub fn seek_forward(&mut self, len: usize) {
+        self.offset += len as u64;
     }
 }
 

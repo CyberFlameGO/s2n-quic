@@ -2,6 +2,7 @@
 members = [
     "common/compliance/cargo-compliance",
     "common/s2n-*",
+    "netbench/netbench*",
     "quic/s2n-*",
     "tls/s2n-*",
 ]

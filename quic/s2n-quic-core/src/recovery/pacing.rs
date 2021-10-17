@@ -57,6 +57,11 @@ impl Pacer {
         max_datagram_size: u16,
         slow_start: bool,
     ) {
+        // low RTT networks should not be paced
+        if rtt_estimator.smoothed_rtt() < Duration::from_millis(5) {
+            return;
+        }
+
         if self.capacity == 0 {
             if let Some(next_packet_departure_time) = self.next_packet_departure_time {
                 let interval = Self::interval(

@@ -14,7 +14,7 @@ use std::{
 };
 use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 
-const DEFUALT_STREAM_WINDOW: u64 = 2560000;
+const DEFUALT_STREAM_WINDOW: u64 = 256000;
 const DEFAULT_MAX_STREAMS: u64 = 100;
 
 #[derive(Clone, Debug)]
@@ -93,10 +93,14 @@ impl<T: AsyncRead + AsyncWrite> Connection<T> {
             };
         }
 
-        if self.inner.as_ref().is_write_vectored() {
-            let mut chunks = self.write_buf.chunks();
+        if self.write_buf.is_empty() {
+            return Ok(());
+        }
 
-            return match self.inner.as_mut().poll_write_vectored(cx, &mut chunks) {
+        if self.inner.as_ref().is_write_vectored() {
+            let chunks = self.write_buf.chunks();
+
+            return match self.inner.as_mut().poll_write_vectored(cx, &chunks) {
                 Poll::Ready(result) => {
                     let len = result?;
                     self.write_buf.advance(len);
@@ -148,7 +152,7 @@ impl<T: AsyncRead + AsyncWrite> Connection<T> {
 
             match self.dispatch_frame(cx) {
                 Poll::Ready(result) => result?,
-                Poll::Pending => return Ok(()).into(),
+                Poll::Pending => return Ok(()),
             }
         }
     }

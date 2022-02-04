@@ -1,23 +1,8 @@
 [package]
 name = "netbench-cli"
 version = "0.1.0"
-authors = ["Cameron Bytheway <bythewc@amazon.com>"]
 edition = "2018"
 
-[features]
-default = ["native-tls", "s2n-quic", "tcp"]
-native-tls = ["openssl", "tokio-native-tls"]
-tcp = []
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bytes = "1"
-futures = "0.3"
-netbench = { version = "0.1", path = "../netbench" }
-openssl = { version = "0.10", optional = true }
-s2n-quic = { version = "0.1", path = "../../quic/s2n-quic", features = ["tracing-provider"], optional = true }
-s2n-quic-core = { version = "0.1", path = "../../quic/s2n-quic-core", features = ["testing"] }
-structopt = "0.3"
-tokio = { version = "1", features = ["net", "time"] }
-tokio-native-tls = { version = "0.3", optional = true }
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }

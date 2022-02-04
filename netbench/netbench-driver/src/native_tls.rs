@@ -183,7 +183,7 @@ impl Client {
         let mut conn_id = 0;
         for scenario in scenario.iter() {
             // TODO read server address from instance file
-            let addr: SocketAddr = "[::1]:4433".parse()?;
+            let addr: SocketAddr = "192.168.86.76:4433".parse()?;
             let connection = TcpStream::connect(addr).await?;
             let id = conn_id;
             conn_id += 1;

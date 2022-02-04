@@ -1,0 +1,73 @@
+FROM rust:latest as planner
+WORKDIR app
+RUN cargo install cargo-chef --version 0.1.23
+COPY Cargo.toml /app
+COPY common /app/common
+COPY tls /app/tls
+COPY quic /app/quic
+COPY netbench /app/netbench
+RUN cargo chef prepare  --recipe-path recipe.json
+
+FROM rust:latest as cacher
+WORKDIR app
+RUN cargo install cargo-chef --version 0.1.23
+COPY --from=planner /app/recipe.json recipe.json
+RUN cargo chef cook --recipe-path recipe.json
+
+FROM rust:latest AS builder
+WORKDIR app
+
+RUN set -eux; \
+  apt-get update; \
+  apt-get install -y cmake clang;
+
+# copy sources
+COPY Cargo.toml /app
+COPY common /app/common
+COPY tls /app/tls
+COPY quic /app/quic
+COPY netbench /app/netbench
+
+# Copy over the cached dependencies
+COPY --from=cacher /app/target target
+COPY --from=cacher /usr/local/cargo /usr/local/cargo
+
+# build runner
+ARG release="false"
+RUN set -eux; \
+  if [ "$release" = "true" ]; then \
+  RUSTFLAGS="-C link-arg=-s -C panic=abort" \
+  cargo build --bin netbench-driver --release; \
+  cp target/release/netbench-driver .; \
+  else \
+  cargo build --bin netbench-driver; \
+  cp target/debug/netbench-driver .; \
+  fi; \
+  rm -rf target
+
+FROM debian:latest
+
+ENV RUST_BACKTRACE="1"
+
+# install libcrypto
+RUN set -eux; \
+  apt-get update; \
+  apt-get -y install libssl-dev; \
+  rm -rf /var/lib/apt/lists/*; \
+  apt-get clean; \
+  rm -rf /tmp/*; \
+  echo done;
+
+# copy runner
+COPY --from=builder /app/netbench-driver /usr/bin/netbench-driver
+RUN set -eux; \
+  chmod +x /usr/bin/netbench-driver; \
+  ldd /usr/bin/netbench-driver; \
+  # ensure the binary works \
+  netbench-driver --help; \
+  echo done
+
+ARG library="s2n-quic"
+ENV library=${library}
+
+ENTRYPOINT /usr/bin/netbench-driver $library

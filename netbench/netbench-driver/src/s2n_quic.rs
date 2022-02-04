@@ -189,7 +189,7 @@ impl Client {
         // TODO execute client ops instead
         for scenario in scenario.iter() {
             // TODO read server address from instance file
-            let addr: SocketAddr = "[::1]:4433".parse()?;
+            let addr: SocketAddr = "192.168.86.76:4433".parse()?;
             // TODO format the server's connection id as part of the hostname
             let hostname = format!("localhost");
             let connect = s2n_quic::client::Connect::new(addr).with_hostname(hostname);

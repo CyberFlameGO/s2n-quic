@@ -193,12 +193,12 @@ jobs:
         with:
           path: s2n-quic
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: s2n-quic-qns-debug
           path: s2n-quic-qns/
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: s2n-quic-qns-release
           path: s2n-quic-qns/
@@ -237,7 +237,7 @@ jobs:
           python-version: 3.7
 
       - name: Download tshark
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: tshark
           path: .
@@ -323,7 +323,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4.1.7
         with:
           path: results/
 
@@ -433,7 +433,7 @@ jobs:
       - uses: camshaft/rust-cache@v1
 
       - name: Download tshark
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: tshark
           path: .
@@ -462,12 +462,12 @@ jobs:
         if: github.event.pull_request
         run: docker pull public.ecr.aws/y1p7y6w8/s2n-quic-qns:main
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: s2n-quic-qns-debug
           path: s2n-quic-qns-build/
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: s2n-quic-qns-release
           path: s2n-quic-qns-build/
@@ -526,7 +526,7 @@ jobs:
         tls: ["s2n-tls", "rustls"]
 
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: s2n-quic-qns-debug
 
@@ -637,12 +637,12 @@ jobs:
         with:
           crate: ultraman
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: s2n-quic-qns-release
           path: target/release/
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: quinn
           path: target/perf/quinn/bin/
@@ -685,12 +685,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: perf-rustls
           path: ./perf-results/rustls
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: perf-s2n-tls
           path: ./perf-results/s2n-tls
